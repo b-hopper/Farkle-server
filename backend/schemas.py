@@ -42,9 +42,16 @@ class PlayerStatsResponse(BaseModel):
     high_score: int
 
 
-class LeaderboardEntry(BaseModel):
+class PlayerInfoEntry(BaseModel):
     player_id: str
     display_name: str
     wins: int
     avg_score: float
     total_points: int
+
+
+class LeaderboardResponse(BaseModel):
+    rows: List[PlayerInfoEntry]
+
+class PlayerInfoResponse(BaseModel):
+    players: List[PlayerInfoEntry]

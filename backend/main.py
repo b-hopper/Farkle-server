@@ -16,7 +16,8 @@ from .schemas import (
     PlayerCreateRequest,
     GameResultRequest,
     PlayerStatsResponse,
-    LeaderboardEntry,
+    LeaderboardResponse,
+    PlayerInfoResponse,
 )
 from .crud import (
     create_player,
@@ -80,7 +81,7 @@ def player_stats_endpoint(
 
 @app.get(
     "/leaderboard",
-    response_model=List[LeaderboardEntry],
+    response_model=LeaderboardResponse,
     summary="Get leaderboard",
 )
 def leaderboard_endpoint(
@@ -93,12 +94,13 @@ def leaderboard_endpoint(
     db = Depends(get_db),
 ):
     """Return the leaderboard sorted by the specified field."""
-    return get_leaderboard(db, sort, limit)
+    data = get_leaderboard(db, sort, limit)
+    return {"rows": data}
 
 
 @app.get(
     "/user-players",
-    response_model=List[LeaderboardEntry],
+    response_model=PlayerInfoResponse,
     summary="List all players for a user",
 )
 def user_players_endpoint(
@@ -106,7 +108,8 @@ def user_players_endpoint(
     db = Depends(get_db),
 ):
     """Return all player profiles associated with a given user."""
-    return get_user_players(db, user_id)
+    data = get_user_players(db, user_id)
+    return {"players": data}
 
 
 if __name__ == "__main__":
