@@ -153,7 +153,7 @@ def get_leaderboard(db: Session, sort: str, limit: int):
         key=lambda row: (getattr(row, sort) or 0),
         reverse=True,
     )[:limit]
-    return [
+    return { "rows": [
         {
             "player_id": row.player_id,
             "display_name": row.display_name,
@@ -162,7 +162,8 @@ def get_leaderboard(db: Session, sort: str, limit: int):
             "total_points": int(row.total_points or 0),
         }
         for row in sorted_list
-    ]
+    ] }
+
 
 
 def get_user_players(db: Session, user_id: str):
