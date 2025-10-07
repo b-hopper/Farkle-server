@@ -14,6 +14,8 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from .database import Base, engine, get_db
 from .schemas import (
     PlayerCreateRequest,
+    DeletePlayerRequest,
+    DeletePlayerResponse,
     GameResultRequest,
     PlayerStatsResponse,
     LeaderboardResponse,
@@ -21,6 +23,7 @@ from .schemas import (
 )
 from .crud import (
     create_player,
+    delete_player,
     create_game_result,
     get_player_stats,
     get_leaderboard,
@@ -44,6 +47,18 @@ def create_player_endpoint(
     """
     return {"player_id": create_player(db, request.user_id, request.display_name)}
 
+@app.post("/delete-player", response_model=DeletePlayerResponse, summary="Delete a player profile")
+def delete_player_endpoint(
+    payload: DeletePlayerRequest,
+    db = Depends(get_db),
+):
+    """Delete a player profile by its ID.
+
+    This operation will remove the player profile from the database. If the
+    specified `player_id` does not exist, returns success=False.
+    """
+    success = delete_player(db, payload.player_id) 
+    return DeletePlayerResponse(success=success)
 
 @app.post("/game-result", summary="Submit a completed game session")
 def post_game_result_endpoint(

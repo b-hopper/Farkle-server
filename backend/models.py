@@ -35,7 +35,7 @@ class PlayerProfile(Base):
     created_at: datetime = Column(DateTime, default=datetime.utcnow)
     # Relationships
     user = relationship("User", back_populates="players")
-    results = relationship("GameResult", back_populates="player")
+    results = relationship("GameResult", back_populates="player", passive_deletes=True)
 
 
 class Game(Base):
@@ -52,7 +52,10 @@ class GameResult(Base):
     __tablename__ = "game_results"
     result_id: str = Column(String, primary_key=True, index=True)
     game_id: str = Column(String, ForeignKey("games.game_id"), nullable=False)
-    player_id: str = Column(String, ForeignKey("player_profiles.player_id"), nullable=False)
+    player_id: str = Column(String,
+                            ForeignKey("player_profiles.player_id", ondelete="SET NULL"),
+                            nullable=True,
+                            index=True)
     score: int = Column(Integer, nullable=False)
     turns_taken: int = Column(Integer, nullable=False)
     farkles: int = Column(Integer, nullable=False)

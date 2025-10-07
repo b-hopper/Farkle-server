@@ -17,6 +17,13 @@ class PlayerCreateRequest(BaseModel):
     display_name: str = Field(..., description="Name of the local player")
 
 
+class DeletePlayerRequest(BaseModel):
+    player_id: str
+
+class DeletePlayerResponse(BaseModel):
+    success: bool
+
+
 class GameResultEntry(BaseModel):
     player_id: str
     score: int

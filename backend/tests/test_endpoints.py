@@ -11,6 +11,15 @@ def test_create_player():
     })
     assert res.status_code == 200
     assert "player_id" in res.json()
+    
+def test_delete_player():
+    res = client.post("/create-player", json={
+        "user_id": "test-user-1",
+        "display_name": "ToDelete"
+    })
+    player_id = res.json()["player_id"]
+    del_res = client.post("/delete-player", params={"player_id": player_id})
+    assert del_res.status_code == 200
 
 def test_post_game_result():
     # Create user and player

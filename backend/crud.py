@@ -42,6 +42,31 @@ def create_player(db: Session, user_id: str, display_name: str) -> str:
     db.refresh(profile)
     return player_id
 
+def get_or_create_placeholder_player(db: Session, user_id: str) -> PlayerProfile:
+    PLACEHOLDER_ID = f"deleted-{user_id}"
+    pp = db.get(PlayerProfile, PLACEHOLDER_ID)
+    if pp: return pp
+    pp = PlayerProfile(player_id=PLACEHOLDER_ID, user_id=user_id, display_name="Deleted Player")
+    db.add(pp); db.commit(); return pp
+
+def delete_player(db: Session, player_id: str) -> bool:
+    """Delete a player profile by its ID.
+
+    This operation will remove the player profile from the database. If the
+    specified `player_id` does not exist, an HTTP 404 error will be raised.
+    """
+    player = db.get(PlayerProfile, player_id)
+    if not player:
+        return False
+    
+    placeholder = get_or_create_placeholder_player(db, player.user_id)
+    
+    db.query(GameResult).filter_by(player_id=player_id) \
+        .update({"player_id": placeholder.player_id}, synchronize_session=False)
+    
+    db.delete(player)
+    db.commit() 
+    return True
 
 def create_game_result(
     db: Session,
