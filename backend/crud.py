@@ -17,7 +17,6 @@ from sqlalchemy.orm import Session
 
 from .models import User, PlayerProfile, Game, GameResult
 
-
 def create_player(db: Session, user_id: str, display_name: str) -> str:
     """Ensure the user exists and create a new player profile.
 
@@ -92,26 +91,28 @@ def create_game_result(
     )
     db.add(game)
     for res in results:
-        # ``res`` may be a Pydantic model or a dict-like object.  Use attribute
-        # access first then fallback to dict indexing.
-        player_id = getattr(res, "player_id", None) or res.get("player_id")
-        score = getattr(res, "score", None) or res.get("score")
-        turns = getattr(res, "turns", None) or res.get("turns")
-        farkles = getattr(res, "farkles", None) or res.get("farkles")
-        won = getattr(res, "won", None) or res.get("won")
+        
+        player_id   = res.player_id
+        score       = res.score
+        turns       = res.turns
+        farkles     = res.farkles
+        won         = res.won
+        
         player = db.get(PlayerProfile, player_id)
         if not player:
             raise HTTPException(status_code=404, detail=f"Player {player_id} not found")
+        
         result = GameResult(
-            result_id=str(uuid.uuid4()),
-            game_id=game_id,
-            player_id=player_id,
-            score=score,
-            turns_taken=turns,
-            farkles=farkles,
-            won=won,
+            result_id   = str(uuid.uuid4()),
+            game_id     = game_id,
+            player_id   = player_id,
+            score       = score,
+            turns_taken = turns,
+            farkles     = farkles,
+            won         = won,
         )
         db.add(result)
+        
     db.commit()
     return game_id
 
