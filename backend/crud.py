@@ -192,7 +192,12 @@ def get_user_players(db: Session, user_id: str):
     """
     user = db.get(User, user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        # Create the user if not found
+        user = User(user_id=user_id, login_type="anonymous")
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        
     results = (
         db.query(
             PlayerProfile.player_id,
